@@ -37,8 +37,7 @@ class TCPLogic extends Thread {
         String clientMessage;
         boolean isAlive = true;
         try {
-            clientMessage = in.readLine();
-            userConnectHendler(clientMessage);
+            userConnectHendler(in.readLine());
             try {
                 while (isAlive) {
                     clientMessage = in.readLine();

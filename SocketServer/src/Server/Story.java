@@ -7,13 +7,6 @@ import java.util.LinkedList;
 class Story {
 
     final int GLOBAL_MESSAGE = 0;
-    final int GLOBAL_SOURCE_MESSAGE = 0;
-
-    final int CONNECT_MESSAGE_TYPE = 0;
-    final int DISCONNECT_MESSAGE_TYPE = 1;
-    final int IDNUMBER_MESSAGE_TYPE = 2;
-    final int REGULAR_MESSAGE_TYPE = 3;
-    final int REQUEST_STORY_TYPE = 4;
 
     final int COUNT_OF_SAVE_MESSAGES = 100;
 
@@ -27,14 +20,15 @@ class Story {
     }
 
     public void printStoryHelper(BufferedWriter writer,String source,String destination){
+        int destinationId = Integer.parseInt(destination.trim());
         if(story.size() > 0) {
             try {
                 for (StoredMessage item : story) {
-                    if (destination.equals("0")&& item.destination == Integer.parseInt(destination.trim()) ){
+                    if (destination.equals("0")&& item.destination == destinationId ){
                         writer.write(item+"\n");
                     }
                     else {
-                        if (item.source.equals(source) && item.destination == Integer.parseInt(destination.trim()) ||
+                        if (item.source.equals(source) && item.destination == destinationId ||
                                 item.source.equals(destination) && item.destination == Integer.parseInt(source.trim())) {
                             writer.write(item + "\n");
                         }

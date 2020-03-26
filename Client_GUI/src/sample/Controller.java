@@ -21,6 +21,7 @@ public class Controller {
     public Button disbtn;
 
     private Client client;
+    private boolean isActive = true;
 
     final int GLOBAL_MESSAGE = 0;
 
@@ -45,13 +46,16 @@ public class Controller {
         selectPartner.setDisable(false);
         disbtn.setDisable(false);
         sendBtn.setDisable(false);
-        comboAction();
+
+        if (isActive)
+            comboAction();
+
         new ReadMsg().start();
     }
 
     public void SendMessage(){
-        client.clientLogic.writeMsgService(REGULAR_MESSAGE_TYPE,
-                selectPartner.getItems().indexOf(selectPartner.getValue()),client.clientLogic.idNumder,message.getText());
+        int chatId = selectPartner.getItems().indexOf(selectPartner.getValue());
+        client.clientLogic.writeMsgService(REGULAR_MESSAGE_TYPE,chatId,client.clientLogic.idNumder,message.getText());
         message.clear();
     }
 
@@ -72,28 +76,46 @@ public class Controller {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                 chat.clear();
+                isActive = false;
                 boolean isChange = true;
                 int chatId = selectPartner.getItems().indexOf(t1);
                 isChange = renameComboBox(chatId,t1,selectPartner);
 
                 if (isChange)
                     client.clientLogic.getStoryService(chatId);
-
-
             }
         });
         }
 
-    public boolean renameComboBox(int chatId, String tmp, ComboBox<String> selectPartner){
-        if (tmp != null) {
-            String []tmpWords = tmp.split(" ");
-            if (tmpWords[tmpWords.length - 1].equals("+")) {
-                selectPartner.getItems().add(chatId,tmp.substring(0,tmp.length()-2));
+    public boolean renameComboBox(int chatId, String chatName, ComboBox<String> selectPartner){
+        if (chatName != null) {
+            String []words = chatName.split(" ");
+            if (words[words.length - 1].equals("+")) {
+                selectPartner.getItems().add(chatId,chatName.substring(0,chatName.length()-2));
                 selectPartner.getItems().remove(chatId+1);
                 return false;
             }
         }
         return true;
+    }
+
+    private void notifyOfNewMessage(String[] words){
+        int chatId;
+        if (Integer.parseInt(words[1].trim())==GLOBAL_MESSAGE)
+            chatId = 0;
+        else
+            chatId = Integer.parseInt(words[2].trim());
+
+        String chatName = selectPartner.getItems().get(chatId);
+
+        String []tmpWords = chatName.split(" ");
+        if (!tmpWords[tmpWords.length - 1].equals("+")) {
+            try {
+                selectPartner.getItems().remove(chatId);
+                selectPartner.getItems().add(chatId,chatName + " +");
+            }
+            catch (Exception ignored){ }
+        }
     }
 
     private class ReadMsg extends Thread {
@@ -116,21 +138,7 @@ public class Controller {
                                         (words[2].equals(intdexOfChat)&&!words[1].equals("0")))
                                     chat.appendText(words[3] + '\n');
                                 else {
-                                    int chatId;
-                                    if (Integer.parseInt(words[1].trim())==GLOBAL_MESSAGE)
-                                        chatId = 0;
-                                    else
-                                        chatId = Integer.parseInt(words[2].trim());
-                                    String tmp = selectPartner.getItems().get(chatId);
-                                    System.out.println(tmp + " "+chatId);
-                                    String []tmpWords = tmp.split(" ");
-                                    if (!tmpWords[tmpWords.length - 1].equals("+")) {
-                                        try {
-                                            selectPartner.getItems().remove(chatId);
-                                            selectPartner.getItems().add(chatId,tmp + " +");
-                                        }
-                                        catch (Exception ignored){ }
-                                    }
+                                    notifyOfNewMessage(words);
                                 }
                                 break;
                             case DISCONNECT_MESSAGE_TYPE:

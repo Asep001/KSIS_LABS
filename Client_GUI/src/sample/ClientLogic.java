@@ -18,10 +18,9 @@ class ClientLogic {
 
     final int GLOBAL_MESSAGE = 0;
 
-    final int CONNECT_MESSAGE_TYPE = 0;
+
     final int DISCONNECT_MESSAGE_TYPE = 1;
-    final int IDNUMBER_MESSAGE_TYPE = 2;
-    final int REGULAR_MESSAGE_TYPE = 3;
+
     final int REQUEST_STORY_TYPE = 4;
     final int REQUEST_FOR_USERS = 5;
 
