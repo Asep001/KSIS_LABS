@@ -3,10 +3,7 @@ package sample;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.io.IOException;
 
@@ -16,12 +13,13 @@ public class Controller {
     public TextField message;
     public Button connect;
     public TextArea chat;
-    public ComboBox<String> selectPartner;
+    public ComboBox<ComboBoxItem> selectPartner;
     public Button sendBtn;
     public Button disbtn;
 
     private Client client;
     private boolean isActive = true;
+    private int activeItem;
 
     final int GLOBAL_MESSAGE = 0;
 
@@ -39,8 +37,9 @@ public class Controller {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        selectPartner.getItems().add("Global");
-        selectPartner.setValue("Global");
+        ComboBoxItem global =  new ComboBoxItem("Global",0);
+        selectPartner.getItems().add( global);
+        selectPartner.setValue(global);
 
         connect.setDisable(true);
         selectPartner.setDisable(false);
@@ -54,7 +53,7 @@ public class Controller {
     }
 
     public void SendMessage(){
-        int chatId = selectPartner.getItems().indexOf(selectPartner.getValue());
+        int chatId = activeItem;
         client.clientLogic.writeMsgService(REGULAR_MESSAGE_TYPE,chatId,client.clientLogic.idNumder,message.getText());
         message.clear();
     }
@@ -72,26 +71,26 @@ public class Controller {
     }
 
     public void comboAction(){
-        selectPartner.valueProperty().addListener(new ChangeListener<String>() {
+        selectPartner.valueProperty().addListener(new ChangeListener<ComboBoxItem>() {
             @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+            public void changed(ObservableValue<? extends ComboBoxItem> observableValue, ComboBoxItem comboBoxItem, ComboBoxItem t1) {
                 chat.clear();
                 isActive = false;
                 boolean isChange = true;
                 int chatId = selectPartner.getItems().indexOf(t1);
-                isChange = renameComboBox(chatId,t1,selectPartner);
-
+                isChange = renameComboBox(chatId,t1.name,selectPartner);
+                activeItem = chatId;
                 if (isChange)
                     client.clientLogic.getStoryService(chatId);
             }
         });
         }
 
-    public boolean renameComboBox(int chatId, String chatName, ComboBox<String> selectPartner){
+    public boolean renameComboBox(int chatId, String chatName,ComboBox<ComboBoxItem> selectPartner){
         if (chatName != null) {
             String []words = chatName.split(" ");
             if (words[words.length - 1].equals("+")) {
-                selectPartner.getItems().add(chatId,chatName.substring(0,chatName.length()-2));
+                selectPartner.getItems().add(chatId,new ComboBoxItem(chatName.substring(0,chatName.length()-2),chatId));
                 selectPartner.getItems().remove(chatId+1);
                 return false;
             }
@@ -106,13 +105,13 @@ public class Controller {
         else
             chatId = Integer.parseInt(words[2].trim());
 
-        String chatName = selectPartner.getItems().get(chatId);
+        String chatName = selectPartner.getItems().get(chatId).name;
 
         String []tmpWords = chatName.split(" ");
         if (!tmpWords[tmpWords.length - 1].equals("+")) {
             try {
                 selectPartner.getItems().remove(chatId);
-                selectPartner.getItems().add(chatId,chatName + " +");
+                selectPartner.getItems().add(chatId,new ComboBoxItem(chatName + " +",chatId));
             }
             catch (Exception ignored){ }
         }
@@ -122,6 +121,7 @@ public class Controller {
         @Override
         public void run() {
             String recvMessage;
+            int counter = 1;
             try {
                 client.clientLogic.in.readLine();
                 while (true) {
@@ -131,25 +131,24 @@ public class Controller {
                     if (!words[0].equals("")) {
                         switch (Integer.parseInt(words[0].trim())) {
                             case CONNECT_MESSAGE_TYPE:
-                                selectPartner.getItems().add(words[2]);
+                                selectPartner.getItems().add(new ComboBoxItem(words[2],counter));
                                 break;
                             case REGULAR_MESSAGE_TYPE:
                                 if (words[1].equals(intdexOfChat) ||
                                         (words[2].equals(intdexOfChat)&&!words[1].equals("0")))
                                     chat.appendText(words[3] + '\n');
-                                else {
+                                else
                                     notifyOfNewMessage(words);
-                                }
                                 break;
                             case DISCONNECT_MESSAGE_TYPE:
-                                selectPartner.getItems().remove(words[2]);
+                                selectPartner.getItems().remove(Integer.parseInt(words[2].trim()));
                                 break;
                             case IDNUMBER_MESSAGE_TYPE:
                                 System.out.println(words[2] + '\n');
                                 client.clientLogic.idNumder = Integer.parseInt(words[2].trim());
                                 break;
                             case REQUEST_FOR_USERS:
-                                selectPartner.getItems().add(words[1]);
+                                selectPartner.getItems().add(new ComboBoxItem(words[1],counter));
                                 break;
                         }
                     }

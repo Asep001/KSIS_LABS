@@ -13,10 +13,10 @@ class UDPThead extends Thread
 
     final int BUF_SIZE = 512;
 
-        public UDPThead(DatagramSocket datagramSocket, int tcpPort) {
-            this.datagramSocket = datagramSocket;
-            this.tcpPort = tcpPort;
-        }
+    public UDPThead(DatagramSocket datagramSocket, int tcpPort) {
+        this.datagramSocket = datagramSocket;
+        this.tcpPort = tcpPort;
+    }
 
 
     public void run()
@@ -31,7 +31,7 @@ class UDPThead extends Thread
                 System.out.println("\n--->" + recvString);
                 InetAddress iaLocal = InetAddress.getLocalHost();
 
-                sendStringService(iaLocal.getHostAddress()+" "+tcpPort,words[0],words[1]);
+                sendStringService(iaLocal.getHostAddress() + " " + tcpPort, words[0], words[1]);
             }
         }
         catch(SocketException se)
@@ -55,6 +55,7 @@ class UDPThead extends Thread
         datagramSocket.receive(datagramPacket);
         return new String(recvString);
     }
+
     void sendStringService(String string,String destination, String port)
             throws IOException
     {

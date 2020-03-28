@@ -13,7 +13,7 @@
       <Button fx:id="connect" layoutX="604.0" layoutY="53.0" mnemonicParsing="false" onAction="#Connect" prefHeight="25.0" prefWidth="149.0" text="Connect" />
       <TextField fx:id="message" layoutY="263.0" prefHeight="25.0" prefWidth="598.0" />
       <Button fx:id="sendBtn" disable="true" layoutX="604.0" layoutY="263.0" mnemonicParsing="false" onAction="#SendMessage" prefHeight="25.0" prefWidth="149.0" text="Send" />
-      <ComboBox fx:id="selectPartner" disable="true" layoutX="604.0" layoutY="104.0" prefWidth="150.0" />
+      <ComboBox fx:id="selectPartner" disable="true" layoutX="604.0" layoutY="94.0" prefWidth="150.0" />
       <Button fx:id="disbtn" disable="true" layoutX="604.0" layoutY="177.0" mnemonicParsing="false" onAction="#SendStopMessage" prefHeight="25.0" prefWidth="149.0" text="Disconnect" />
    </children>
 </AnchorPane>

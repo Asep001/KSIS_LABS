@@ -46,7 +46,7 @@ class TCPLogic extends Thread {
                     if (!words[0].equals("")) {
                         switch (Integer.parseInt(words[0].trim())) {
                             case DISCONNECT_MESSAGE_TYPE:
-                                removeUserHendler();
+                                removeUserHendler(Integer.parseInt(words[2].trim()));
                                 TCPConnection.globalStory.delStoryHelper(idNumber);
                                 this.closeConnectionService();
                                 isAlive = false;
@@ -99,12 +99,12 @@ class TCPLogic extends Thread {
         } catch (IOException ignored) {}
     }
 
-    private void removeUserHendler(){
+    private void removeUserHendler(int idOfDisconnectUser){
         System.out.println(this.nickName+" leave chat.");
         int counter = 1;
         for (TCPLogic item : TCPConnection.serverList) {
             item.idNumber=counter;
-            item.sendMessageService(DISCONNECT_MESSAGE_TYPE+" "+GLOBAL_SOURCE_MESSAGE+" "+this.nickName+" leave chat.\n");
+            item.sendMessageService(DISCONNECT_MESSAGE_TYPE+" "+GLOBAL_SOURCE_MESSAGE+" "+idOfDisconnectUser+" leave chat.\n");
             item.sendMessageService(IDNUMBER_MESSAGE_TYPE+" "+this.nickName+" "+item.idNumber+" leave chat.\n");
             counter++;
             if (item == this) {
@@ -116,12 +116,12 @@ class TCPLogic extends Thread {
 
     private void userConnectHendler(String clientMessage){
         this.nickName = clientMessage;
-        String connect_message = CONNECT_MESSAGE_TYPE+" "+this.idNumber + " "+ this.nickName+ " connected to the server!\n";
+        String connect_message = CONNECT_MESSAGE_TYPE + " "+ this.idNumber + " "+ this.nickName + " connected to the server!\n";
         for (TCPLogic users : TCPConnection.serverList) {
             users.sendMessageService(connect_message);
 
             if (users == this) {
-                users.sendMessageService(IDNUMBER_MESSAGE_TYPE + " " +this.nickName  + " "+ this.idNumber+ " connected to the server!\n");
+                users.sendMessageService(IDNUMBER_MESSAGE_TYPE + " " + this.nickName  + " "+ this.idNumber+ " connected to the server!\n");
             }
         }
         System.out.println(this.nickName+ " connected to the server!\n");
