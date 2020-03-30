@@ -41,13 +41,19 @@ public class Controller {
         selectPartner.getItems().add( global);
         selectPartner.setValue(global);
 
+
+
         connect.setDisable(true);
         selectPartner.setDisable(false);
         disbtn.setDisable(false);
         sendBtn.setDisable(false);
 
-        if (isActive)
+        if (isActive){
+            activeItem = global.id;
+            client.clientLogic.getStoryService(activeItem);
             comboAction();
+        }
+
 
         new ReadMsg().start();
     }
@@ -134,13 +140,17 @@ public class Controller {
                                 selectPartner.getItems().add(new ComboBoxItem(words[2],counter));
                                 break;
                             case REGULAR_MESSAGE_TYPE:
-                                if (words[1].equals(intdexOfChat) ||
-                                        (words[2].equals(intdexOfChat)&&!words[1].equals("0")))
+                            if ((words[1].equals(intdexOfChat)&&words[2].equals(intdexOfChat)) ||
+                                        (words[2].equals(intdexOfChat)&&!words[1].equals("0"))||
+                                    (words[1].equals("0")&&words[1].equals(intdexOfChat))||
+                                    (words[1].equals(intdexOfChat)&&words[2].equals(Integer.toString(client.clientLogic.idNumder))))
                                     chat.appendText(words[3] + '\n');
                                 else
                                     notifyOfNewMessage(words);
                                 break;
                             case DISCONNECT_MESSAGE_TYPE:
+                                if (activeItem!=GLOBAL_MESSAGE)
+                                    selectPartner.setValue(selectPartner.getItems().get(activeItem-1));
                                 selectPartner.getItems().remove(Integer.parseInt(words[2].trim()));
                                 break;
                             case IDNUMBER_MESSAGE_TYPE:
