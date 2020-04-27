@@ -1,11 +1,11 @@
 package sample;
 
 public class ComboBoxItem {
-    public int id;
+    public Long id;
     public String name;
 
 
-    public ComboBoxItem(String name,int id){
+    public ComboBoxItem(String name,Long id){
         this.id =id;
         this.name = name;
     }

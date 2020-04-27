@@ -12,8 +12,10 @@ public class SocketServer
         final int TCP_PORT = 9998;
 
         //UDP
+        InetAddress ipAddr = null;
         try
         {
+            ipAddr = InetAddress.getLocalHost();
             datagramSocket = new DatagramSocket(UDP_PORT);
         }
         catch(Exception ex)
@@ -21,7 +23,8 @@ public class SocketServer
             System.out.println(ex.toString());
             System.exit(0);
         }
-        System.out.println("UDP Port: " + UDP_PORT+ "\nTCP Port: "+TCP_PORT);
+        System.out.println("UDP Port: " + UDP_PORT+ "\nTCP Port: "+TCP_PORT+"\n"+ipAddr);
+
 
         UDPThead udpThead = new UDPThead(datagramSocket, TCP_PORT);
         udpThead.start();
